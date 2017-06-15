@@ -1,0 +1,24 @@
+{
+  "name": "lloople/deployer",
+  "version" : "0.5.3",
+  "description": "Eina per deployar projectes segons la seva API",
+  "type": "project",
+  "authors": [
+    {
+      "name": "Lloople",
+      "email": "d.lloople@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Deployer\\": "app/"
+    },
+    "files" : ["app/helpers.php"]
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "vlucas/phpdotenv": "^2.4",
+    "filp/whoops": "2.*",
+    "symfony/var-dumper": "^3.3@dev"
+  }
+}
