@@ -8,7 +8,6 @@ class DeployerServiceProvider
 
     const providers = [
         WhoopsServiceProvider::class,
-//      DotEnvServiceProvider::class,
         ConfigurationServiceProvider::class,
     ];
 

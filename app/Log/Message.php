@@ -5,14 +5,7 @@ namespace Deployer\Log;
 class Message
 {
 
-    /**
-     * @var string
-     */
     private $type;
-
-    /**
-     * @var string
-     */
     private $message;
 
     public function __construct($type, $message)

@@ -29,9 +29,6 @@ class Deployer
 
     }
 
-    /**
-     * @param \Deployer\Servers\Server $server
-     */
     public function deploy(Server $server)
     {
         $this->server = $server;

@@ -6,14 +6,8 @@ use Deployer\Servers\Change;
 use Deployer\Servers\Interfaces\ServerInterface;
 use Deployer\Servers\Server;
 
-/**
- * Class BitbucketServer
- *
- * @package Deployer\Servers\Bitbucket
- */
 class BitbucketServer extends Server implements ServerInterface
 {
-
     private $payload;
 
     public function __construct(array $repository)
@@ -36,22 +30,21 @@ class BitbucketServer extends Server implements ServerInterface
         return json_decode(file_get_contents('php://input'));
     }
 
-    /**
-     * @param array $changes
-     */
-    public function setChanges(array $changes)
+    public function setChanges(array $rawChanges)
     {
-        $changesClass = [];
-        foreach ($changes as $changeRaw) {
-            $changesClass[] = BitbucketFactory::newChange($changeRaw);
+        $changes = [];
+
+        foreach ($rawChanges as $rawChange) {
+            $changes[] = new BitbucketChange($rawChange);
         }
 
-        return parent::setChanges($changesClass);
+        return parent::setChanges($changes);
     }
 
     public function beforeDeploymentTasks()
     {
         $this->log->info('Starting to deploy ' . $this->getRepository());
+
         foreach ($this->getChanges() as $change) {
             if ($change->isBranch() && array_key_exists($change->getBranch(), $this->getBranches())) {
                 $this->addDeployableChange($change);
@@ -97,16 +90,17 @@ class BitbucketServer extends Server implements ServerInterface
         $this->log->info(BitbucketMessages::getDeployingBranch($branch));
         $cdCommand = 'cd ' . $branchDir;
 
-        // We need to move to the directory in every command we execute
         foreach ($this->getBranchCommands($branch) as $pos => $command) {
             $output = [];
             $commandExec = str_replace(['%branch%', '%branchDir%'], [$branch, $branchDir], $command);
 
             $this->log->info("Executing " . $commandExec);
             exec($cdCommand . ' && ' . $commandExec, $output, $return);
+
             foreach ($output as $outputMessage) {
                 $this->log->info($outputMessage);
             }
+
             if ($return !== 0) {
                 $this->log->error('An error ' . $return . ' has occured while trying to execute ' . $commandExec);
                 break;

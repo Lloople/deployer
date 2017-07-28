@@ -6,8 +6,6 @@ namespace Deployer\Servers\Interfaces;
 interface ChangeInterface
 {
 
-    public function setRawData(\stdClass $rawData);
-
     public function getAuthor(): string;
 
     public function getBranch(): string;

@@ -2,23 +2,9 @@
 
 namespace Deployer\Log;
 
-/**
- * @purpose Classe que actua com a Singleton
- *          No podem fer un new Log(), hem de fer un
- *          Log::instance() per tal de recuperar la instància que
- *          ja teniem d'aquesta classe, així només tenim una a
- *          tota l'aplicació
- *
- * Class Log
- *
- * @package Deployer
- */
 final class Log
 {
 
-    /**
-     * @var array
-     */
     private $messages = [];
 
     private $debug = false;
@@ -26,7 +12,8 @@ final class Log
     private function __construct() { }
 
     /**
-     * @purpose Create or gets the instance of Log
+     * Create or gets the instance of Log.
+     *
      * @return \Deployer\Log
      */
     public static function instance()

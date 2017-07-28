@@ -2,11 +2,6 @@
 
 namespace Deployer\Servers;
 
-/**
- * Class Change
- *
- * @package Deployer\Servers
- */
 abstract class Change
 {
 
@@ -16,11 +11,18 @@ abstract class Change
     private $type;
     private $branch;
 
+    public function __construct($rawData)
+    {
+        $this->rawData = $rawData;
+    }
+
     public function getAuthor(): string { return $this->author; }
 
     public function setAuthor(string $author)
     {
         $this->author = $author;
+
+        return $this;
     }
 
     public function getMessage(): string { return $this->message; }
@@ -28,6 +30,8 @@ abstract class Change
     public function setMessage(string $message)
     {
         $this->message = $message;
+
+        return $this;
     }
 
     public function getType(): string { return $this->type; }
@@ -35,6 +39,8 @@ abstract class Change
     public function setType(string $type)
     {
         $this->type = $type;
+
+        return $this;
     }
 
     public function getBranch(): string { return $this->branch; }
@@ -42,5 +48,7 @@ abstract class Change
     public function setBranch(string $branch)
     {
         $this->branch = $branch;
+
+        return $this;
     }
 }
