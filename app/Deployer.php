@@ -25,7 +25,7 @@ class Deployer
             }
         }
 
-        throw new \Exception('Not authorized', 1001);
+        throw new \Exception('Not authorized', 403);
 
     }
 

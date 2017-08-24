@@ -7,6 +7,9 @@ use Deployer\Log\Log;
 abstract class Server
 {
 
+    /**
+     * @var \Deployer\Log
+     */
     public $log;
     private $repository;
     private $changes = [];
@@ -47,4 +50,8 @@ abstract class Server
 
         return $this;
     }
+
+    abstract public function beforeDeploymentTasks();
+    abstract public function deploymentTasks();
+    abstract public function afterDeploymentTasks();
 }

@@ -3,10 +3,9 @@
 namespace Deployer\Servers\Bitbucket;
 
 use Deployer\Servers\Change;
-use Deployer\Servers\Interfaces\ServerInterface;
 use Deployer\Servers\Server;
 
-class BitbucketServer extends Server implements ServerInterface
+class BitbucketServer extends Server
 {
     private $payload;
 
@@ -56,13 +55,17 @@ class BitbucketServer extends Server implements ServerInterface
 
     public function afterDeploymentTasks()
     {
-        if (! $this->log->inDebug()) {
-            $this->log->info(BitbucketMessages::getDeploymentCompleted());
+        $this->log->info(BitbucketMessages::getDeploymentCompleted());
 
-            foreach ($this->log->getMessages() as $message) {
+        foreach ($this->log->getMessages() as $message) {
+            if ($this->log->inDebug()) {
                 $message->print();
             }
+
         }
+
+
+
     }
 
     public function deploymentTasks()

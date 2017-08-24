@@ -14,5 +14,13 @@ return [
                 ],
             ],
         ],
+        'notifications' => [
+            'slack' => [
+                'token'    => '',
+                'channel'  => '',
+                'username' => '',
+                'icon'     => '',
+            ],
+        ],
     ],
 ];

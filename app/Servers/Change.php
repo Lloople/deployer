@@ -18,14 +18,18 @@ abstract class Change
 
     public function getAuthor(): string { return $this->author; }
 
+    public function getMessage(): string { return $this->message; }
+
+    public function getType(): string { return $this->type; }
+
+    public function getBranch(): string { return $this->branch; }
+
     public function setAuthor(string $author)
     {
         $this->author = $author;
 
         return $this;
     }
-
-    public function getMessage(): string { return $this->message; }
 
     public function setMessage(string $message)
     {
@@ -34,16 +38,12 @@ abstract class Change
         return $this;
     }
 
-    public function getType(): string { return $this->type; }
-
     public function setType(string $type)
     {
         $this->type = $type;
 
         return $this;
     }
-
-    public function getBranch(): string { return $this->branch; }
 
     public function setBranch(string $branch)
     {

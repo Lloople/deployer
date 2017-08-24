@@ -3,10 +3,9 @@
 namespace Deployer\Servers\Bitbucket;
 
 use Deployer\Servers\Change;
-use Deployer\Servers\Interfaces\ChangeInterface;
 
 
-class BitbucketChange extends Change implements ChangeInterface
+class BitbucketChange extends Change
 {
 
     public function __construct($rawData)
