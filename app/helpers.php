@@ -16,6 +16,7 @@ function config(string $index = null)
         return $configuration->get($index);
     }
 }
+
 function base_path(string $path = '')
 {
     return __DIR__ . '/../' . $path;
