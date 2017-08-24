@@ -22,9 +22,9 @@ class Slack
         $this->message = $message;
         $this->client = $this->getClient($options);
 
-        $this->username = config('slack.default.username');
-        $this->icon = config('slack.default.icon');
-        $this->channel = config('slack.default.channel');
+        $this->username = $options['username'] ?? config('slack.default.username');
+        $this->icon = $options['icon'] ?? config('slack.default.icon');
+        $this->channel = $options['channel'] ?? config('slack.default.channel');
 
     }
 

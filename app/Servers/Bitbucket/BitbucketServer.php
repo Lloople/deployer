@@ -4,27 +4,25 @@ namespace Deployer\Servers\Bitbucket;
 
 use Deployer\Servers\Change;
 use Deployer\Servers\Server;
+use Exception;
 
 class BitbucketServer extends Server
 {
     private $payload;
 
-    public function __construct(array $repository)
+    public function __construct(array $configuration)
     {
-        $this->payload = $this->getPayload();
-        $this->setBranches($repository['branches']);
+        parent::__construct($configuration);
 
-        if (! is_null($this->payload) && isset($this->payload->repository)) {
-            $this->setRepository($this->payload->repository->name);
-            $this->setChanges($this->payload->push->changes);
-        } else {
-            throw new \Exception('Bitbucket Payload not found', 1101);
+        if (is_null($this->payload = $this->getPayload()) || ! isset($this->payload->repository)) {
+            throw new Exception('BitBucket Payload not found', 404);
         }
 
-        parent::__construct();
+        $this->setRepository($this->payload->repository->name);
+        $this->setChanges($this->payload->push->changes);
     }
 
-    public function getPayload()
+    private function getPayload()
     {
         return json_decode(file_get_contents('php://input'));
     }
@@ -61,13 +59,18 @@ class BitbucketServer extends Server
             if ($this->log->inDebug()) {
                 $message->print();
             }
+            foreach($this->getMessengers() as $messenger => $configuration) {
+                $messengerClass = 'Deployer\Messengers\\' . ucfirst($messenger) . '\\' . ucfirst($messenger);
 
+                (new $messengerClass($message->getMessage(), $configuration))->send();
+            }
         }
-
-
 
     }
 
+    /**
+     * Deploy each change.
+     */
     public function deploymentTasks()
     {
         foreach ($this->getDeployableChanges() as $change) {
@@ -76,16 +79,17 @@ class BitbucketServer extends Server
             } else {
                 $this->log->error(BitbucketMessages::getDeployError($change->getBranch()));
             }
-
         }
     }
 
     /**
+     * Perform an individual deployment task.
+     *
      * @param \Deployer\Servers\Change $change
      *
      * @return bool
      */
-    public function deploy(Change $change)
+    protected function deploy(Change $change)
     {
         $branch = $change->getBranch();
         $branchDir = $this->getBranchDir($branch);
@@ -113,12 +117,24 @@ class BitbucketServer extends Server
         return true;
     }
 
-    public function getBranchDir(string $branch)
+    /**
+     * Return the path to the given branch.
+     *
+     * @param string $branch
+     * @return mixed
+     */
+    private function getBranchDir(string $branch)
     {
         return $this->getBranches()[$branch]['path'];
     }
 
-    public function getBranchCommands(string $branch)
+    /**
+     * Return an array of commands that must be executed for the given branch.
+     *
+     * @param string $branch
+     * @return mixed
+     */
+    private function getBranchCommands(string $branch)
     {
         return $this->getBranches()[$branch]['commands'];
     }

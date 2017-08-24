@@ -14,7 +14,7 @@ return [
                 ],
             ],
         ],
-        'notifications' => [
+        'messengers' => [
             'slack' => [
                 'token'    => '',
                 'channel'  => '',
