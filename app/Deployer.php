@@ -14,19 +14,19 @@ class Deployer
     public function __construct()
     {
         $this->requestToken = str_replace('/', '', $_SERVER['REQUEST_URI']);
+
         DeployerServiceProvider::load();
     }
 
     public function getAuthorization()
     {
-        foreach(config('repositories') as $repositoryToken => $repositoryInfo) {
+        foreach (config('repositories') as $repositoryToken => $repositoryInfo) {
             if ($repositoryToken === $this->requestToken) {
                 return $repositoryInfo;
             }
         }
 
         throw new \Exception('Not authorized', 403);
-
     }
 
     public function deploy(Server $server)
@@ -37,5 +37,4 @@ class Deployer
         $this->server->deploymentTasks();
         $this->server->afterDeploymentTasks();
     }
-
 }
