@@ -21,7 +21,7 @@ abstract class Server
     public function __construct(array $configuration = [])
     {
         $this->setBranches($configuration['branches'] ?? []);
-        $this->setMessengers($configuration['notifications'] ?? []);
+        $this->setMessengers($configuration['messengers'] ?? []);
         $this->log = Log::instance();
     }
 
@@ -33,16 +33,20 @@ abstract class Server
 
     public function getBranches(): array { return $this->branches; }
 
-    public function getMessengers(): array { return $this->notifications; }
+    public function getMessengers(): array { return $this->messengers; }
 
     public function setRepository(string $repository)
     {
         $this->repository = $repository;
+
+        return $this;
     }
 
     public function setChanges(array $changes)
     {
         $this->changes = $changes;
+
+        return $this;
     }
 
     public function addDeployableChange(Change $change)
@@ -57,9 +61,9 @@ abstract class Server
         return $this;
     }
 
-    public function setMessengers(array $notifications)
+    public function setMessengers(array $messengers)
     {
-        $this->notifications = $notifications;
+        $this->messengers = $messengers;
 
         return $this;
     }

@@ -73,8 +73,9 @@ class Slack
 
     public function send()
     {
-        return $this->client->post('/services/hooks/incoming-webhook', [
-            'body' => $this->getParams()
+        // todo: this must be dynamic
+        return $this->client->post('api/chat.postMessage', [
+            'body' => $this->getParams(),
         ]);
     }
 

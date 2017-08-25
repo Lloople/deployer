@@ -2,6 +2,7 @@
 
 namespace Deployer\Servers\Bitbucket;
 
+use Deployer\Factories\MessengerFactory;
 use Deployer\Servers\Change;
 use Deployer\Servers\Server;
 use Exception;
@@ -14,12 +15,21 @@ class BitbucketServer extends Server
     {
         parent::__construct($configuration);
 
-        if (is_null($this->payload = $this->getPayload()) || ! isset($this->payload->repository)) {
+        $this->buildFromPayload();
+    }
+
+    public function buildFromPayload()
+    {
+        if (is_null($this->payload = $this->getPayload())) {
             throw new Exception('BitBucket Payload not found', 404);
         }
 
-        $this->setRepository($this->payload->repository->name);
-        $this->setChanges($this->payload->push->changes);
+        try {
+            $this->setRepository($this->payload->repository->name)
+                ->setChanges($this->payload->push->changes);
+        } catch (Exception $e) {
+            throw new Exception('Bitbucket Payload bad format', 403);
+        }
     }
 
     private function getPayload()
@@ -55,17 +65,16 @@ class BitbucketServer extends Server
     {
         $this->log->info(BitbucketMessages::getDeploymentCompleted());
 
-        foreach ($this->log->getMessages() as $message) {
-            if ($this->log->inDebug()) {
-                $message->print();
-            }
-            foreach($this->getMessengers() as $messenger => $configuration) {
-                $messengerClass = 'Deployer\Messengers\\' . ucfirst($messenger) . '\\' . ucfirst($messenger);
+        $logDump = $this->log->dump();
 
-                (new $messengerClass($message->getMessage(), $configuration))->send();
-            }
+        if ($this->log->inDebug()) {
+            echo $logDump;
         }
 
+        foreach ($this->getMessengers() as $messenger => $configuration) {
+            $messenger = (new MessengerFactory())->create($messenger, $logDump, $configuration);
+            $response = $messenger->send();
+        }
     }
 
     /**

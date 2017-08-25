@@ -27,8 +27,7 @@ class BitbucketChange extends Change
 
     public function extractAuthorFromChange()
     {
-
-        $author = $this->rawData->change->new->target->author;
+        $author = $this->rawData->new->target->author;
 
         return $author->user->display_name ?? $author->raw;
     }
