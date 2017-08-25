@@ -2,23 +2,34 @@
 
 namespace Deployer\Servers\Bitbucket;
 
-
 use Deployer\Servers\Change;
-use Deployer\Servers\Interfaces\ChangeInterface;
 
-/**
- * Class BitbucketChange
- *
- * @package Deployer\Servers\Bitbucket
- */
-class BitbucketChange extends Change implements ChangeInterface
+
+class BitbucketChange extends Change
 {
 
-    public function setRawData(\stdClass $rawData)
+    public function __construct($rawData)
     {
-        $this->rawData = $rawData;
+        parent::__construct($rawData);
+
+        $this->setAuthor($this->extractAuthorFromChange())
+            ->setType($rawData->new->type)
+            ->setMessage($rawData->new->target->message)
+            ->setBranch($rawData->new->name);
+
+        return $this;
     }
-    
-    public function isBranch() { return $this->getType() == 'branch'; }
+
+    public function isBranch()
+    {
+        return $this->getType() == 'branch';
+    }
+
+    public function extractAuthorFromChange()
+    {
+        $author = $this->rawData->new->target->author;
+
+        return $author->user->display_name ?? $author->raw;
+    }
 
 }

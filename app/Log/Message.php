@@ -5,14 +5,7 @@ namespace Deployer\Log;
 class Message
 {
 
-    /**
-     * @var string
-     */
     private $type;
-
-    /**
-     * @var string
-     */
     private $message;
 
     public function __construct($type, $message)
@@ -47,7 +40,12 @@ class Message
 
     public function print()
     {
-        echo strtoupper($this->getType()) . ': ' . $this->getMessage() . PHP_EOL;
+        echo $this->formatted();
+    }
+
+    public function formatted()
+    {
+        return strtoupper($this->getType()) . ': ' . $this->getMessage() . PHP_EOL;
     }
 
 }

@@ -7,9 +7,8 @@ class DeployerServiceProvider
 {
 
     const providers = [
-        WhoopsServiceProvider::class,
-//      DotEnvServiceProvider::class,
         ConfigurationServiceProvider::class,
+        ExceptionHandlerServiceProvider::class
     ];
 
     public static function load()
