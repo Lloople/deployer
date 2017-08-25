@@ -40,7 +40,12 @@ class Message
 
     public function print()
     {
-        echo strtoupper($this->getType()) . ': ' . $this->getMessage() . PHP_EOL;
+        echo $this->formatted();
+    }
+
+    public function formatted()
+    {
+        return strtoupper($this->getType()) . ': ' . $this->getMessage() . PHP_EOL;
     }
 
 }
