@@ -1,13 +1,12 @@
 <?php
 
 return [
-    'token' => '',
-    'base_url'   => 'https://slack.com',
-    'exceptions' => false,
+    'base_uri'   => 'https://slack.com',
+    'token'      => '',
     'default'    => [
-        'username' => 'Deployer Testing',
+        'username' => 'Deployer',
         'channel'  => '#general',
-        'icon'     => ':bulb:',
+        'avatar'   => ':bot:',
     ],
 
 ];

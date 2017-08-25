@@ -18,8 +18,8 @@ return [
             'slack' => [
                 'token'    => '',
                 'channel'  => '',
-                'username' => '',
-                'icon'     => '',
+                'username' => 'Deployer',
+                'avatar'   => ':bot:',
             ],
         ],
     ],

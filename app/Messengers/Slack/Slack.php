@@ -15,16 +15,23 @@ class Slack
     private $username;
     private $icon;
     private $channel;
+    private $token;
+
+    public $showIcon = true;
 
     public function __construct(string $message, array $options = [])
     {
         $this->message = $message;
-        $this->client = $this->getClient($options);
+        $this->client = $this->setClient($options);
 
-        $this->username = _get_arr($options, 'username', config('slack.default.username')) . ' - ' . strtoupper(gethostname());
-        $this->icon = _get_arr($options, 'icon', config('slack.default.icon'));
+        $this->token = _get_arr($options, 'token', config('slack.token'));
+
+        if ($this->token == '') {
+            throw new \Exception('No Slack token provided', 403);
+        }
+        $this->username = _get_arr($options, 'username', config('slack.default.username'));
+        $this->avatar = _get_arr($options, 'avatar', config('slack.default.avatar'));
         $this->channel = _get_arr($options, 'channel', config('slack.default.channel'));
-
     }
 
     /**
@@ -53,7 +60,7 @@ class Slack
      * @param mixed $icon
      * @return Slack
      */
-    public function icon($icon): Slack
+    public function avatar($icon): Slack
     {
         $this->icon = $icon;
 
@@ -73,56 +80,97 @@ class Slack
 
     public function send()
     {
-        // todo: this must be dynamic
-        return $this->client->post('api/chat.postMessage', [
-            'body' => $this->getParams(),
+        return $this->client->post('/api/chat.postMessage', [
+            'form_params' => $this->getParams(),
         ]);
     }
 
 
-    private function getParams()
+    public function getParams(): array
     {
-        return json_encode([
-            'channel'     => $this->channel,
-            'text'        => '',
-            'as_user'     => false,
-            'username'    => $this->username,
-            'icon_emoji'  => $this->icon,
-            'attachments' => [
-                [
-                    'text'  => $this->message,
-                    'color' => $this->getColor(),
-                ],
-            ],
-        ]);
+        return [
+            'token'      => $this->token,
+            'channel'    => $this->channel,
+            'text'       => $this->printMessage(),
+            'as_user'    => false,
+            'username'   => $this->getUsername(),
+            'icon_emoji' => $this->getAvatar(),
+        ];
     }
 
 
-    private function getClient(array $options): Client
+    private function setClient(array $options): Client
     {
         return new Client([
-            'base_uri' => _get_arr($options, 'base_uri', config('slack.base_url')),
-            'default'  => [
-                'query'      => [
-                    'token' => _get_arr($options, 'token', config('slack.token')),
-                ],
-                'exceptions' => _get_arr($options, 'exceptions', config('slack.exceptions')),
-            ],
+            'base_uri' => _get_arr($options, 'base_uri', config('slack.base_uri')),
         ]);
-
     }
 
-    private function getColor()
+    public function getClient(): Client { return $this->client; }
+
+    public function disableIcon(): Slack
     {
-        if (strpos($this->message, 'ERROR:') !== false) {
-            return "#FF0000";
-        }
+        $this->showIcon = false;
 
-        if (strpos($this->message, 'WARNING:') !== false) {
-            return "#F4C542";
-        }
-
-        return "00AD2B";
+        return $this;
     }
+
+    public function enableIcon(): Slack
+    {
+        $this->showIcon = true;
+
+        return $this;
+    }
+
+    public function printMessage(): string
+    {
+        $return = '';
+
+        if ($this->showIcon) {
+            $return .= $this->getIcon() . PHP_EOL;
+        }
+
+        return $return .= $this->message;
+    }
+
+    private function getAvatar(): string
+    {
+        if ($this->messageError()) {
+            return ":facepalm-meme:";
+        }
+
+        if ($this->messageWarning()) {
+            return ":grumpy:";
+        }
+
+        if ($this->messageSuccess()) {
+            return ":success-kid:";
+        }
+
+        return $this->icon;
+    }
+
+    private function getIcon(): string
+    {
+        if ($this->messageError()) {
+            return ':x:';
+        }
+
+        if ($this->messageWarning()) {
+            return ':warning:';
+        }
+
+        return ':white_check_mark:';
+    }
+
+    private function getUsername(): string
+    {
+        return $this->username.' - '.strtoupper(gethostname()).' - '.date('Y-m-d H:i:s');
+
+    }
+
+    private function messageSuccess(): bool { return strpos($this->message, 'SUCCESS:') !== false; }
+    private function messageError(): bool { return strpos($this->message, 'ERROR:') !== false; }
+    private function messageWarning(): bool { return strpos($this->message, 'WARNING:') !== false; }
 
 }
