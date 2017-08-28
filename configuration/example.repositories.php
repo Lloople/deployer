@@ -14,5 +14,13 @@ return [
                 ],
             ],
         ],
+        'messengers' => [
+            'slack' => [
+                'token'    => '',
+                'channel'  => '',
+                'username' => 'Deployer',
+                'avatar'   => ':bot:',
+            ],
+        ],
     ],
 ];

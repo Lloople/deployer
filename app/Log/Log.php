@@ -2,23 +2,9 @@
 
 namespace Deployer\Log;
 
-/**
- * @purpose Classe que actua com a Singleton
- *          No podem fer un new Log(), hem de fer un
- *          Log::instance() per tal de recuperar la instància que
- *          ja teniem d'aquesta classe, així només tenim una a
- *          tota l'aplicació
- *
- * Class Log
- *
- * @package Deployer
- */
 final class Log
 {
 
-    /**
-     * @var array
-     */
     private $messages = [];
 
     private $debug = false;
@@ -26,7 +12,8 @@ final class Log
     private function __construct() { }
 
     /**
-     * @purpose Create or gets the instance of Log
+     * Create or gets the instance of Log.
+     *
      * @return \Deployer\Log
      */
     public static function instance()
@@ -40,6 +27,12 @@ final class Log
         return $instance;
     }
 
+    /**
+     * Create a new message.
+     *
+     * @param string $type
+     * @param string $message
+     */
     public function message(string $type, string $message)
     {
         $msg = new Message($type, $message);
@@ -50,21 +43,41 @@ final class Log
         }
     }
 
+    /**
+     * Create a new message of type info.
+     *
+     * @param string $message
+     */
     public function info(string $message)
     {
-       $this->message('info', $message);
+        $this->message('info', $message);
     }
 
+    /**
+     * Create a new message of type error.
+     *
+     * @param string $message
+     */
     public function error(string $message)
     {
         $this->message('error', $message);
     }
 
+    /**
+     * Create a new message of type warning.
+     *
+     * @param string $message
+     */
     public function warning(string $message)
     {
         $this->message('warning', $message);
     }
 
+    /**
+     * Create a new message of type success.
+     *
+     * @param string $message
+     */
     public function success(string $message)
     {
         $this->message('success', $message);
@@ -72,9 +85,15 @@ final class Log
 
     public function getMessages(): array { return $this->messages; }
 
+    /**
+     * Check if the current log contains any message of the given type.
+     *
+     * @param string $type
+     * @return bool
+     */
     public function hasAny(string $type): bool
     {
-        foreach($this->getMessages() as $message) {
+        foreach ($this->getMessages() as $message) {
             if ($message->is($type)) {
                 return true;
             }
@@ -91,5 +110,17 @@ final class Log
     public function inDebug(): bool
     {
         return $this->debug;
+    }
+
+    /**
+     * Retrieve all the messages.
+     *
+     * @return string
+     */
+    public function dump()
+    {
+        return implode('', array_map(function (Message $message) {
+            return $message->formatted();
+        }, $this->getMessages()));
     }
 }

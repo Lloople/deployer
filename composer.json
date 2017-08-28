@@ -1,6 +1,6 @@
 {
   "name": "lloople/deployer",
-  "version" : "0.5.4",
+  "version" : "0.5.5",
   "description": "Eina per deployar projectes segons la seva API",
   "type": "project",
   "authors": [
@@ -11,14 +11,19 @@
   ],
   "autoload": {
     "psr-4": {
-      "Deployer\\": "app/"
+      "Deployer\\": "app/",
+      "Tests\\": "tests/"
     },
     "files" : ["app/helpers.php"]
   },
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "require": {
     "vlucas/phpdotenv": "^2.4",
     "filp/whoops": "2.*",
-    "symfony/var-dumper": "^3.3@dev"
+    "symfony/var-dumper": "^3.3@dev",
+    "guzzlehttp/guzzle": "~6.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "6.3.0"
   }
 }
