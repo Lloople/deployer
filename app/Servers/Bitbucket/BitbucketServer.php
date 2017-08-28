@@ -42,7 +42,9 @@ class BitbucketServer extends Server
         $changes = [];
 
         foreach ($rawChanges as $rawChange) {
-            $changes[] = new BitbucketChange($rawChange);
+            if (! is_null($rawChange->new)) {
+                $changes[] = new BitbucketChange($rawChange);
+            }
         }
 
         return parent::setChanges($changes);

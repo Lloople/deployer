@@ -153,7 +153,7 @@ class Slack
             return ":grin:";
         }
 
-        return $this->icon;
+        return $this->avatar;
     }
 
     private function getIcon(): string
