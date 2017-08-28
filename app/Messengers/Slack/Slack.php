@@ -86,9 +86,9 @@ class Slack
     }
 
 
-    public function getParams(): array
+    public function getParams(string $key = '')
     {
-        return [
+        $params = [
             'token'      => $this->token,
             'channel'    => $this->channel,
             'text'       => $this->printMessage(),
@@ -96,6 +96,12 @@ class Slack
             'username'   => $this->getUsername(),
             'icon_emoji' => $this->getAvatar(),
         ];
+
+        if ($key !== '' && array_key_exists($key, $params)) {
+            return $params[$key];
+        }
+
+        return $params;
     }
 
 
@@ -130,21 +136,21 @@ class Slack
             $return .= $this->getIcon() . PHP_EOL;
         }
 
-        return $return .= $this->message;
+        return $return . $this->message;
     }
 
     private function getAvatar(): string
     {
         if ($this->messageError()) {
-            return ":facepalm-meme:";
+            return ":scream:";
         }
 
         if ($this->messageWarning()) {
-            return ":grumpy:";
+            return ":thinking_face:";
         }
 
         if ($this->messageSuccess()) {
-            return ":success-kid:";
+            return ":grin:";
         }
 
         return $this->icon;
@@ -165,7 +171,7 @@ class Slack
 
     private function getUsername(): string
     {
-        return $this->username.' - '.strtoupper(gethostname()).' - '.date('Y-m-d H:i:s');
+        return $this->username.' - '.strtoupper(gethostname()).' - '.date('YmdHis');
 
     }
 

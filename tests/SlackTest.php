@@ -55,11 +55,25 @@ class SlackTest extends TestCase
         $this->slack->as('another_user')->channel('#testing')->avatar(':fire:')->message('🐵');
 
         $params = $this->slack->getParams();
-        $this->assertEquals($params['username'], 'another_user - '.strtoupper(gethostname()).' - '.date('Y-m-d H:i:s'));
+        $this->assertEquals($params['username'], 'another_user - '.strtoupper(gethostname()).' - '.date('YmdHis'));
         $this->assertEquals($params['channel'], '#testing');
         $this->assertEquals($params['icon_emoji'], ':fire:');
         $this->assertEquals($params['token'], '🐶🐱🐴🐟');
         $this->assertEquals($params['text'], '🐵');
     }
+
+    /** @test */
+    public function default_icons_are_set_properly()
+    {
+        $this->slack->message('SUCCESS: The icon should be grin');
+        $this->assertEquals(':grin:', $this->slack->getParams('icon_emoji'));
+
+        $this->slack->message('WARNING: The icon should be thinking face');
+        $this->assertEquals(':thinking_face:', $this->slack->getParams('icon_emoji'));
+
+        $this->slack->message('ERROR: The icon should be scream');
+        $this->assertEquals(':scream:', $this->slack->getParams('icon_emoji'));
+    }
+
 
 }
