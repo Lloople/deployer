@@ -8,7 +8,8 @@ class DeployerServiceProvider
 
     const providers = [
         ConfigurationServiceProvider::class,
-        ExceptionHandlerServiceProvider::class
+        ExceptionHandlerServiceProvider::class,
+        VerifyInstallationServiceProvider::class,
     ];
 
     public static function load()
