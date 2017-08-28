@@ -16,7 +16,7 @@
     },
     "files" : ["app/helpers.php"]
   },
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "require": {
     "vlucas/phpdotenv": "^2.4",
     "filp/whoops": "2.*",
