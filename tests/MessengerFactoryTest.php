@@ -26,10 +26,6 @@ class MessengerFactoryTest extends TestCase
     /** @test */
     public function can_generate_messenger_class_name()
     {
-        $className = $this->factory->getMessengerClass('🕷');
-
-        $this->assertEquals('Deployer\\Messengers\\🕷\\🕷', $className);
-
         $className = $this->factory->getMessengerClass('spider');
 
         $this->assertEquals('Deployer\\Messengers\\Spider\\Spider', $className);

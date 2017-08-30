@@ -57,7 +57,7 @@ class SlackTest extends TestCase
         $params = $this->slack->getParams();
         $this->assertEquals($params['username'], 'another_user - '.strtoupper(gethostname()).' - '.date('YmdHis'));
         $this->assertEquals($params['channel'], '#testing');
-        $this->assertEquals($params['icon_emoji'], ':fire:');
+        $this->assertEquals($params['icon_emoji'], ':bot:');
         $this->assertEquals($params['token'], '🐶🐱🐴🐟');
         $this->assertEquals($params['text'], '🐵');
     }
