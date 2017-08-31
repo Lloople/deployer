@@ -28,6 +28,14 @@ final class Log
     }
 
     /**
+     * Clean the already logged messages.
+     */
+    public function clear()
+    {
+        $this->messages = [];
+    }
+
+    /**
      * Create a new message.
      *
      * @param string $type
