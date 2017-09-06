@@ -16,7 +16,6 @@ abstract class Server
     private $changes = [];
     private $deployableChanges = [];
     private $branches = [];
-    private $notifications = [];
 
     public function __construct(array $configuration = [])
     {

@@ -6,15 +6,21 @@ function dd($var)
     exit;
 }
 
-function config(string $index = null)
+function config($search = null)
 {
     $configuration = \Deployer\Configuration::instance();
 
-    if (is_null($index)) {
+    if (is_array($search)) {
+        reset($search);
+        $key = key($search);
+        return $configuration->set($key, $search[$key]);
+    }
+
+    if (is_null($search)) {
         return $configuration->all();
     }
 
-    return $configuration->get($index);
+    return $configuration->get($search);
 
 }
 

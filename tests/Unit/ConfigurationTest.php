@@ -1,11 +1,9 @@
 <?php
 
-
-namespace Tests;
-
+namespace Tests\Unit;
 
 use Deployer\Configuration;
-
+use Tests\TestCase;
 
 class ConfigurationTest extends TestCase
 {
@@ -19,6 +17,7 @@ class ConfigurationTest extends TestCase
     public function setUp()
     {
         parent::setUp();
+
         $this->configuration = Configuration::instance();
     }
 
@@ -54,6 +53,7 @@ class ConfigurationTest extends TestCase
     public function can_retrieve_default_configuration()
     {
         $this->assertEquals('defaultValue', $this->configuration->get('thisKeyDoesNotExist', 'defaultValue'));
+
         $this->assertEquals('', $this->configuration->get('thisKeyAlsoDoesNotExist', ''));
     }
 }

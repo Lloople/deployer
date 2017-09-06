@@ -1,12 +1,10 @@
 <?php
 
-
-namespace Tests;
-
-
+namespace Tests\Unit;
 
 use Deployer\Log\Log;
 use Deployer\Log\Message;
+use Tests\TestCase;
 
 class LogTest extends TestCase
 {
@@ -31,6 +29,19 @@ class LogTest extends TestCase
     }
 
     /** @test */
+    public function log_messages_can_be_cleared()
+    {
+        $this->log->success('First message');
+        $this->log->error('Second message');
+
+        $this->assertEquals(2, $this->log->count());
+
+        $this->log->clear();
+
+        $this->assertEquals(0, $this->log->count());
+    }
+
+    /** @test */
     public function can_create_info_message()
     {
         $this->log->clear();
@@ -52,6 +63,7 @@ class LogTest extends TestCase
     public function can_create_success_message()
     {
         $this->log->clear();
+
         $this->log->success('Success message');
 
         $message = $this->retrieveLogFirstMessage();
@@ -63,6 +75,42 @@ class LogTest extends TestCase
         $this->assertEquals('Success message', $message->getMessage());
 
         $this->assertEquals('success', $message->getType());
+    }
+
+    /** @test */
+    public function can_create_error_message()
+    {
+        $this->log->clear();
+
+        $this->log->error('Error message');
+
+        $message = $this->retrieveLogFirstMessage();
+
+        $this->assertNotNull($message);
+
+        $this->assertInstanceOf(Message::class, $message);
+
+        $this->assertEquals('Error message', $message->getMessage());
+
+        $this->assertEquals('error', $message->getType());
+    }
+
+    /** @test */
+    public function can_create_warning_message()
+    {
+        $this->log->clear();
+
+        $this->log->warning('Warning message');
+
+        $message = $this->retrieveLogFirstMessage();
+
+        $this->assertNotNull($message);
+
+        $this->assertInstanceOf(Message::class, $message);
+
+        $this->assertEquals('Warning message', $message->getMessage());
+
+        $this->assertEquals('warning', $message->getType());
     }
 
     private function retrieveLogFirstMessage()

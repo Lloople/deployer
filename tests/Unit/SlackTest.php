@@ -1,9 +1,10 @@
 <?php
 
-namespace Tests;
+namespace Tests\Unit;
 
 use Deployer\Messengers\Slack\Slack;
 use GuzzleHttp\Client;
+use Tests\TestCase;
 
 class SlackTest extends TestCase
 {
@@ -19,6 +20,7 @@ class SlackTest extends TestCase
 
         $this->slack = new Slack('This is the message', ['token' => '🐶🐱🐴🐟']);
     }
+
     /** @test */
     public function can_create_slack_message_instance()
     {
@@ -50,15 +52,21 @@ class SlackTest extends TestCase
     public function can_modify_slack_params()
     {
         $this->slack->disableIcon();
+
         $this->assertEquals($this->slack->printMessage(), 'This is the message');
 
         $this->slack->as('another_user')->channel('#testing')->avatar(':fire:')->message('🐵');
 
         $params = $this->slack->getParams();
-        $this->assertEquals($params['username'], 'another_user - '.strtoupper(gethostname()).' - '.date('YmdHis'));
+
+        $this->assertStringStartsWith('another_user - ' . strtoupper(gethostname()) . ' - ' . date('YmdH'), $params['username']);
+
         $this->assertEquals($params['channel'], '#testing');
+
         $this->assertEquals($params['icon_emoji'], ':bot:');
+
         $this->assertEquals($params['token'], '🐶🐱🐴🐟');
+
         $this->assertEquals($params['text'], '🐵');
     }
 

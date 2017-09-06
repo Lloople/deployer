@@ -11,17 +11,31 @@ class Deployer
 
     private $server;
 
+    private $token;
+
     public function __construct()
     {
-        $this->requestToken = str_replace('/', '', $_SERVER['REQUEST_URI']);
+
+        $this->initializeToken();
 
         DeployerServiceProvider::load();
+    }
+
+    public function initializeToken()
+    {
+        if (! isset($_SERVER['REQUEST_URI'])) {
+
+            throw new \Exception('Server Request URI was not found.');
+        }
+
+        $this->token = str_replace('/', '', $_SERVER['REQUEST_URI']);
+
     }
 
     public function getAuthorization()
     {
         foreach (config('repositories') as $repositoryToken => $repositoryInfo) {
-            if ($repositoryToken === $this->requestToken) {
+            if ($repositoryToken === $this->getToken()) {
                 return $repositoryInfo;
             }
         }
@@ -36,5 +50,9 @@ class Deployer
         $this->server->beforeDeploymentTasks();
         $this->server->deploymentTasks();
         $this->server->afterDeploymentTasks();
+
+        return $this;
     }
+
+    public function getToken() { return $this->token; }
 }

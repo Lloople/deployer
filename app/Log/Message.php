@@ -10,19 +10,28 @@ class Message
 
     public function __construct($type, $message)
     {
-        $this->setType($type)->setMessage($message);
-
-        return $this;
+        $this->setType($type)
+            ->setMessage($message);
     }
 
-    public function setType(string $type)
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+
+    private function setType(string $type)
     {
         $this->type = $type;
 
         return $this;
     }
 
-    public function setMessage(string $message)
+    private function setMessage(string $message)
     {
         $this->message = $message;
 
@@ -33,10 +42,6 @@ class Message
     {
         return $this->getType() === $type;
     }
-
-    public function getType(): string { return $this->type; }
-
-    public function getMessage(): string { return $this->message; }
 
     public function print()
     {
