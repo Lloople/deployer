@@ -9,19 +9,24 @@ final class Log
 
     private $debug = false;
 
-    private function __construct() { }
+    private function __construct(bool $debug = false)
+    {
+        $this->debug = $debug;
+    }
 
     /**
      * Create or gets the instance of Log.
      *
-     * @return \Deployer\Log
+     * @param bool $debug
+     *
+     * @return \Deployer\Log\Log|null
      */
-    public static function instance()
+    public static function instance($debug = false)
     {
         static $instance = null;
 
         if (is_null($instance)) {
-            $instance = new Log();
+            $instance = new Log($debug);
         }
 
         return $instance;

@@ -1,10 +1,11 @@
 <?php
 
-namespace Deployer\Servers;
+namespace Deployer\Services;
 
 use Deployer\Log\Log;
+use Tightenco\Collect\Support\Collection;
 
-abstract class Server
+abstract class Service
 {
 
     /**
@@ -67,8 +68,37 @@ abstract class Server
         return $this;
     }
 
-    abstract public function beforeDeploymentTasks();
-    abstract public function deploymentTasks();
-    abstract public function afterDeploymentTasks();
-    abstract protected function deploy(Change $change);
+    public function getChangesToDeploy(): Collection
+    {
+        return collect($this->getChanges())->filter(function (Change $change) {
+            return $change->isBranch() && $this->shouldDeployChange($change);
+        });
+    }
+
+    public function shouldDeployChange(Change $change)
+    {
+        return in_array($change->getBranch(), $this->getBranches());
+    }
+
+    /**
+     * Return the path to the given branch.
+     *
+     * @param string $branch
+     * @return mixed
+     */
+    public function getBranchDir(string $branch)
+    {
+        return $this->getBranches()[$branch]['path'];
+    }
+
+    /**
+     * Return an array of commands that must be executed for the given branch.
+     *
+     * @param string $branch
+     * @return mixed
+     */
+    public function getBranchCommands(string $branch)
+    {
+        return $this->getBranches()[$branch]['commands'];
+    }
 }

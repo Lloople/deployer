@@ -2,7 +2,6 @@
 
 namespace Deployer\Providers;
 
-
 class DeployerServiceProvider
 {
 

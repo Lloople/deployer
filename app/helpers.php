@@ -1,11 +1,5 @@
 <?php
 
-function dd($var)
-{
-    dump($var);
-    exit;
-}
-
 function config($search = null)
 {
     $configuration = \Deployer\Configuration::instance();
