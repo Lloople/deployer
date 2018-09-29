@@ -68,10 +68,12 @@ abstract class Service
         return $this;
     }
 
-    public function getChangesToDeploy(): Collection
+    public function getBranchesToDeploy(): Collection
     {
         return collect($this->getChanges())->filter(function (Change $change) {
             return $change->isBranch() && $this->shouldDeployChange($change);
+        })->map(function (Change $change) {
+            return $change->getBranch();
         });
     }
 

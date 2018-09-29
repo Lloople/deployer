@@ -5,7 +5,6 @@ namespace Deployer;
 use Deployer\Factories\MessengerFactory;
 use Deployer\Log\Log;
 use Deployer\Providers\DeployerServiceProvider;
-use Deployer\Services\Change;
 use Deployer\Services\Service;
 
 class Deployer
@@ -58,8 +57,8 @@ class Deployer
 
         $this->log->info(Messages::getDeployingService($this->getService()->getRepository()));
 
-        $this->service->getChangesToDeploy()->each(function (Change $change) {
-            $this->deploy($change);
+        $this->service->getBranchesToDeploy()->each(function (string $branch) {
+            $this->deploy($branch);
         });
 
         $this->afterDeploymentTasks();
@@ -112,40 +111,37 @@ class Deployer
     /**
      * Perform an individual deployment task.
      *
-     * @param \Deployer\Services\Change $change
+     * @param string $branch
      */
-    protected function deploy(Change $change)
+    protected function deploy(string $branch)
     {
-        $branch = $change->getBranch();
-        $branchDir = $this->service->getBranchDir($branch);
-
         $this->log->info(Messages::getDeployingBranch($branch));
-        $cdCommand = 'cd ' . $branchDir;
 
-        foreach ($this->service->getBranchCommands($branch) as $pos => $command) {
+        foreach ($this->service->getBranchCommands($branch) as $command) {
             $output = [];
-            $commandExec = str_replace(['%branch%', '%branchDir%'], [$branch, $branchDir], $command);
+
+            $commandExec = str_replace(['%branch%', '%branchDir%'], [$branch, $this->service->getBranchDir($branch)], $command);
 
             $this->log->info("Executing " . $commandExec);
 
-            exec($cdCommand . ' && ' . $commandExec, $output, $return);
+            exec("cd {$this->service->getBranchDir($branch)} && {$commandExec}", $output, $return);
 
             foreach ($output as $outputMessage) {
                 $this->log->info($outputMessage);
             }
 
             if ($return !== 0) {
-                $this->log->error('An error ' . $return . ' has occurred while trying to execute ' . $commandExec);
+                $this->log->error("An error {$return} has occurred while trying to execute {$commandExec}");
                 break;
             }
         }
 
         if ($this->log->hasAny('error')) {
-            $this->log->error(Messages::getDeployError($change->getBranch()));
+            $this->log->error(Messages::getDeployError($branch));
 
             return;
         }
 
-        $this->log->success(Messages::getDeploySuccess($change->getBranch()));
+        $this->log->success(Messages::getDeploySuccess($branch));
     }
 }
