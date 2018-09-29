@@ -2,17 +2,18 @@
 
 namespace Deployer;
 
-
 use Deployer\Providers\DeployerServiceProvider;
 use Deployer\Servers\Server;
 
 class Deployer
 {
 
+    const VERSION = '1.0.0';
+
     private $server;
 
     private $token;
-
+    
     public function __construct()
     {
 

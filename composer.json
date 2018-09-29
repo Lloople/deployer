@@ -1,7 +1,6 @@
 {
   "name": "lloople/deployer",
-  "version" : "0.5.5",
-  "description": "Eina per deployar projectes segons la seva API",
+  "description": "Deploy your projects specifying the commands to be executed.",
   "type": "project",
   "authors": [
     {
