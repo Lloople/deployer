@@ -2,17 +2,6 @@
 
 namespace Deployer;
 
-/**
- * @purpose Classe que actua com a Singleton
- *          No podem fer un new Log(), hem de fer un
- *          Log::instance() per tal de recuperar la instància que
- *          ja teniem d'aquesta classe, així només tenim una a
- *          tota l'aplicació
- *
- * Class Log
- *
- * @package Deployer
- */
 final class Configuration
 {
 
@@ -23,13 +12,17 @@ final class Configuration
     /**
      * @param string|null $index
      *
+     * @param string $default
      * @return array|mixed|null
      */
-    public function get(string $index = null)
+    public function get(string $index = null, $default = '')
     {
         $queryResult = self::instance()->all();
 
         foreach (explode('.', $index) as $param) {
+            if (! isset($queryResult[$param])) {
+                return $default;
+            }
             $queryResult = $queryResult[$param];
         }
 
@@ -38,8 +31,9 @@ final class Configuration
     }
 
     /**
-     * @purpose Create or gets the instance of Log
-     * @return \Deployer\Log
+     * Create or gets the instance of Configuration class.
+     *
+     * @return \Deployer\Configuration
      */
     public static function instance()
     {
@@ -52,10 +46,14 @@ final class Configuration
         return $instance;
     }
 
-    public function set(string $index, array $values)
+    public function set($key, $value)
     {
-        $this->configurations[$index] = $values;
+        array_set($this->configurations, $key, $value);
+
+        return $this->get($key);
+
     }
+
 
     public function all()
     {

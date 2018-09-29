@@ -6,16 +6,21 @@ namespace Deployer\Providers;
 class DeployerServiceProvider
 {
 
-    const providers = [
-        ConfigurationServiceProvider::class,
-        ExceptionHandlerServiceProvider::class,
-        VerifyInstallationServiceProvider::class,
-    ];
-
-    public static function load()
+    public static function load(array $providers = [])
     {
-        foreach (static::providers as $provider) {
+        if (empty($providers)) {
+            $providers = self::getAppProviders();
+        }
+
+        foreach ($providers as $provider) {
             $provider::register();
         }
+    }
+
+    private static function getAppProviders()
+    {
+        $appConfiguration = include base_path('configuration') . '/app.php';
+
+        return $appConfiguration['providers'];
     }
 }

@@ -27,6 +27,18 @@ final class Log
         return $instance;
     }
 
+    public function getMessages(): array { return $this->messages; }
+
+    public function count(): int { return count($this->messages); }
+
+    /**
+     * Clean the already logged messages.
+     */
+    public function clear()
+    {
+        $this->messages = [];
+    }
+
     /**
      * Create a new message.
      *
@@ -82,8 +94,6 @@ final class Log
     {
         $this->message('success', $message);
     }
-
-    public function getMessages(): array { return $this->messages; }
 
     /**
      * Check if the current log contains any message of the given type.

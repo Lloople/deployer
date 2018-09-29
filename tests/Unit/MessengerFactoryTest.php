@@ -1,12 +1,11 @@
 <?php
 
-
-namespace Tests;
-
+namespace Tests\Unit;
 
 use Deployer\Exceptions\MessengerNotFound;
 use Deployer\Factories\MessengerFactory;
 use Deployer\Messengers\Slack\Slack;
+use Tests\TestCase;
 
 class MessengerFactoryTest extends TestCase
 {
@@ -26,15 +25,12 @@ class MessengerFactoryTest extends TestCase
     /** @test */
     public function can_generate_messenger_class_name()
     {
-        $className = $this->factory->getMessengerClass('🕷');
-
-        $this->assertEquals('Deployer\\Messengers\\🕷\\🕷', $className);
-
         $className = $this->factory->getMessengerClass('spider');
 
         $this->assertEquals('Deployer\\Messengers\\Spider\\Spider', $className);
 
     }
+
     /** @test */
     public function can_create_slack_messenger_from_factory()
     {
