@@ -19,7 +19,6 @@
   "require": {
     "vlucas/phpdotenv": "^2.4",
     "filp/whoops": "2.*",
-    "symfony/var-dumper": "^3.3@dev",
     "guzzlehttp/guzzle": "~6.0",
     "tightenco/collect": "^5.7"
   },
