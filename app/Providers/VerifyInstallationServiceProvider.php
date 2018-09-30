@@ -6,7 +6,7 @@ namespace Deployer\Providers;
 
 use Deployer\Exceptions\RepositoriesFileException;
 
-class VerifyInstallationServiceProvider
+class VerifyInstallationServiceProvider implements ServiceProvider
 {
 
     public static function register()

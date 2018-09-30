@@ -2,9 +2,11 @@
 
 namespace Deployer;
 
+use Deployer\Exceptions\BranchPathNotFoundException;
 use Deployer\Factories\MessengerFactory;
 use Deployer\Log\Log;
 use Deployer\Providers\DeployerServiceProvider;
+use Deployer\Services\Branch;
 use Deployer\Services\Service;
 
 class Deployer
@@ -12,86 +14,90 @@ class Deployer
 
     const VERSION = '1.0.0';
 
-    private $token;
-
     /** @var Service */
     private $service;
 
-    /** @var \Deployer\Log  */
+    /** @var \Deployer\Log\Log  */
     private $log;
 
-    /**
-     * Deployer constructor.
-     *
-     * @throws \Exception
-     */
     public function __construct()
     {
-        $this->initializeToken();
-
-        DeployerServiceProvider::load();
-
         $this->log = Log::instance(config('app.debug'));
     }
 
-    public function getToken() { return $this->token; }
-
     /**
-     * @throws \Exception
+     * @param \Deployer\Services\Service $service
      */
-    public function initializeToken()
+    public function run(Service $service)
     {
-        if (! isset($_SERVER['REQUEST_URI'])) {
-            throw new \Exception('Server Request URI was not found.');
-        }
+        $this->log->info(Messages::getDeployingRepository($service->getRepository()));
 
-        $this->token = str_replace('/', '', $_SERVER['REQUEST_URI']);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function run()
-    {
-        $this->service = $this->getService();
-
-        $this->log->info(Messages::getDeployingService($this->getService()->getRepository()));
-
-        $this->service->getBranchesToDeploy()->each(function (string $branch) {
+        $service->getBranchesToDeploy()->each(function (Branch $branch) {
             $this->deploy($branch);
         });
 
-        $this->afterDeploymentTasks();
+        $this->afterDeploymentTasks($service);
     }
 
     /**
-     * @return Service
+     * @param string $token
+     *
      * @throws \Exception
      */
-    private function getService()
+    public function setService(string $token)
     {
-        $configuration = $this->getRepositoryConfiguration();
-
-        return new $configuration['service']($configuration);
-    }
-
-    /**
-     * @return array
-     * @throws \Exception
-     */
-    public function getRepositoryConfiguration()
-    {
-        $configuration = collect(config('repositories'))->get($this->getToken());
+        $configuration = collect(config('repositories'))->get($token);
 
         if (! $configuration) {
-            throw new \Exception('Not authorized', 403);
+            throw new \Exception('Service not found.', 404);
         }
 
-        return $configuration;
+        $this->service = new $configuration['service']($configuration);
     }
 
+    /**
+     * Perform an individual deployment task.
+     *
+     * @param \Deployer\Services\Branch $branch
+     *
+     * @throws \Deployer\Exceptions\BranchPathNotFoundException
+     */
+    protected function deploy(Branch $branch)
+    {
+        $this->log->info(Messages::getDeployingBranch($branch->getName()));
 
-    public function afterDeploymentTasks()
+        $this->checkBranchPathExists($branch);
+
+        foreach ($branch->getCommands() as $command) {
+
+            $output = [];
+
+            $commandExec = str_replace(['%branch%', '%branchDir%'], [$branch->getName(), $branch->getPath()], $command);
+
+            $this->log->info("Executing " . $commandExec);
+
+            exec("cd {$branch->getPath()} && {$commandExec} 2>&1", $output, $return);
+
+            foreach ($output as $outputMessage) {
+                $this->log->info("\t " . $outputMessage);
+            }
+
+            if ($return !== 0) {
+                $this->log->error("An error {$return} has occurred while trying to execute {$commandExec}.");
+                break;
+            }
+        }
+
+        if ($this->log->hasAny('error')) {
+            $this->log->error(Messages::getDeployError($branch->getName()));
+
+            return;
+        }
+
+        $this->log->success(Messages::getDeploySuccess($branch->getName()));
+    }
+
+    public function afterDeploymentTasks(Service $service)
     {
         $this->log->info(Messages::getDeploymentCompleted());
 
@@ -101,47 +107,25 @@ class Deployer
             echo $logDump;
         }
 
-        // todo: Falta re-fer aquesta part
-        foreach ($this->getMessengers() as $messenger => $configuration) {
+        foreach ($service->getMessengers() as $messenger => $configuration) {
             $messenger = (new MessengerFactory())->create($messenger, $logDump, $configuration);
             $response = $messenger->send();
         }
     }
 
     /**
-     * Perform an individual deployment task.
+     * @param $branch
      *
-     * @param string $branch
+     * @throws \Deployer\Exceptions\BranchPathNotFoundException
      */
-    protected function deploy(string $branch)
+    private function checkBranchPathExists($branch)
     {
-        $this->log->info(Messages::getDeployingBranch($branch));
+        $output = shell_exec("cd {$branch->getPath()} 2>&1");
 
-        foreach ($this->service->getBranchCommands($branch) as $command) {
-            $output = [];
+        if ($output !== null) {
+            $this->log->error($output);
 
-            $commandExec = str_replace(['%branch%', '%branchDir%'], [$branch, $this->service->getBranchDir($branch)], $command);
-
-            $this->log->info("Executing " . $commandExec);
-
-            exec("cd {$this->service->getBranchDir($branch)} && {$commandExec}", $output, $return);
-
-            foreach ($output as $outputMessage) {
-                $this->log->info($outputMessage);
-            }
-
-            if ($return !== 0) {
-                $this->log->error("An error {$return} has occurred while trying to execute {$commandExec}");
-                break;
-            }
+            throw new BranchPathNotFoundException($branch);
         }
-
-        if ($this->log->hasAny('error')) {
-            $this->log->error(Messages::getDeployError($branch));
-
-            return;
-        }
-
-        $this->log->success(Messages::getDeploySuccess($branch));
     }
 }

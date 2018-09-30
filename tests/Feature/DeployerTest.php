@@ -2,112 +2,100 @@
 
 namespace Tests\Feature;
 
-use Deployer\Configuration;
 use Deployer\Deployer;
-use PHPUnit\Framework\TestCase;
+use Deployer\Exceptions\InvalidTokenException;
+use Deployer\Log\Log;
+use Deployer\Providers\DeployerServiceProvider;
+use Deployer\Providers\ServiceProvider;
+use Deployer\Request;
+use Deployer\Services\Service;
 use Tests\Fake\FakeService;
+use Tests\TestCase;
 
 class DeployerTest extends TestCase
 {
-
-    protected function setUp()
+    /** @test */
+    public function service_provider_can_load_providers()
     {
-        parent::setUp();
+        $serviceProvider = new DeployerServiceProvider();
 
-        $config = Configuration::instance();
+        $serviceProvider->load([DummyServiceProvider::class]);
 
-        $config->set('repositories', include base_path('tests/Fake/repositories.php'));
+        $this->assertTrue(DummyServiceProvider::$loaded);
     }
 
     /** @test */
-    public function create_app_without_uri_throws_an_exception()
+    public function log_instance_can_be_set_to_debug()
     {
-        $this->expectExceptionMessage('Server Request URI was not found.');
+        config(['app.debug' => true]);
 
         $app = new Deployer();
+
+        $this->assertTrue(Log::instance()->inDebug());
     }
 
     /** @test */
-    public function create_app_with_uri()
+    public function log_instance_can_disable_debug()
     {
-        $this->mockRequestUri();
+        config(['app.debug' => false]);
 
         $app = new Deployer();
 
-        $this->assertInstanceOf(Deployer::class, $app);
+        $this->assertFalse(Log::instance()->inDebug());
     }
 
     /** @test */
-    public function token_was_initialized()
+    public function exception_is_thrown_if_request_cannot_get_the_token()
     {
-        $this->mockRequestUri();
+        $this->expectException(InvalidTokenException::class);
 
-        $app = new Deployer();
+        unset($_SERVER['REQUEST_URI']);
 
-        $this->assertEquals('token', $app->getToken());
+        $request = new Request();
+    }
+
+    /** @test */
+    public function request_can_get_the_token_from_server_variables()
+    {
+        $_SERVER['REQUEST_URI'] = 'foo-bar';
+
+        $request = new Request();
+
+        $this->assertEquals('foo-bar', $request->getToken());
     }
 
     /** @test */
     public function not_authorized_token_throws_exception()
     {
-        $this->expectExceptionMessage('Not authorized');
+        $this->expectException(InvalidTokenException::class);
 
-        $this->expectExceptionCode(403);
+        $_SERVER['REQUEST_URI'] = 'invalid-token';
 
-        $this->mockRequestUri('repository-token');
-
-        $app = new Deployer();
-
-        $repositoryConfiguration = $app->getRepositoryConfiguration();
+        $service = Service::getFromRequest(new Request());
     }
 
     /** @test */
     public function can_authorize_a_token()
     {
-        $this->mockRequestUri('repository-token');
+        $_SERVER['REQUEST_URI'] = 'valid-token';
 
-        $app = new Deployer();
+        config(['repositories.valid-token' => [
+            'repository' => 'testing-repository',
+            'service' => FakeService::class
+        ]]);
 
-        config(['repositories.repository-token' => ['repository' => 'testing-repository']]);
+        $fakeService = Service::getFromRequest(new Request());
 
-        $repositoryConfiguration = $app->getRepositoryConfiguration();
-
-        $this->assertEquals(['repository' => 'testing-repository'], $repositoryConfiguration);
-    }
-
-    /** @test */
-    public function can_deploy_fake_server()
-    {
-        $this->mockRequestUri('fake-token');
-
-        $app = new Deployer();
-
-        $this->setFakeRepositoryConfiguration();
-
-        $repositoryConfiguration = $app->getRepositoryConfiguration();
-
-        $fakeServer = new FakeService($repositoryConfiguration);
-
-        $this->assertInstanceOf(Deployer::class, $app->deploy($fakeServer));
-    }
-
-    private function setFakeRepositoryConfiguration()
-    {
-        return config([
-            'repositories.fake-token' => [
-                'repository' => 'fake-repository',
-                'branches' => [
-                    'fake-develop' => [
-                        'path' => 'fake/path',
-                        'commands' => 'cd .'
-                    ]
-                ]
-            ]
-        ]);
-    }
-
-    private function mockRequestUri($token = 'token')
-    {
-        $_SERVER['REQUEST_URI'] = $token;
+        $this->assertEquals('testing-repository', $fakeService->getRepository());
     }
 }
+
+class DummyServiceProvider implements ServiceProvider
+{
+    public static $loaded = false;
+
+    public static function register()
+    {
+        self::$loaded = true;
+    }
+};

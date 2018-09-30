@@ -2,7 +2,10 @@
 
 namespace Deployer\Services;
 
+use Deployer\Configuration;
+use Deployer\Exceptions\InvalidTokenException;
 use Deployer\Log\Log;
+use Deployer\Request;
 use Tightenco\Collect\Support\Collection;
 
 abstract class Service
@@ -13,16 +16,29 @@ abstract class Service
      */
     public $log;
 
-    private $repository;
-    private $changes = [];
-    private $deployableChanges = [];
-    private $branches = [];
+    protected $repository;
+    protected $changes = [];
+    protected $messengers = [];
+    protected $branches = [];
 
     public function __construct(array $configuration = [])
     {
-        $this->setBranches($configuration['branches'] ?? []);
-        $this->setMessengers($configuration['messengers'] ?? []);
+        $this->branches = $configuration['branches'] ?? [];
+        $this->messengers = $configuration['messengers'] ?? [];
+        $this->repository = $configuration['repository'];
+
         $this->log = Log::instance();
+    }
+
+    public static function getFromRequest(Request $request): Service
+    {
+        $configuration = Configuration::instance()->get('repositories.'.$request->getToken());
+
+        if (! $configuration) {
+            throw new InvalidTokenException();
+        }
+
+        return new $configuration['service']($configuration, $request);
     }
 
     public function getRepository(): string { return $this->repository; }
@@ -49,58 +65,22 @@ abstract class Service
         return $this;
     }
 
-    public function addDeployableChange(Change $change)
-    {
-        $this->deployableChanges[] = $change;
-    }
-
-    public function setBranches(array $branches)
-    {
-        $this->branches = $branches;
-
-        return $this;
-    }
-
-    public function setMessengers(array $messengers)
-    {
-        $this->messengers = $messengers;
-
-        return $this;
-    }
-
     public function getBranchesToDeploy(): Collection
     {
         return collect($this->getChanges())->filter(function (Change $change) {
             return $change->isBranch() && $this->shouldDeployChange($change);
         })->map(function (Change $change) {
-            return $change->getBranch();
+            return $this->createBranch($change->getBranch());
         });
+    }
+
+    private function createBranch(string $branch)
+    {
+        return new Branch($branch, $this->getBranches()[$branch]);
     }
 
     public function shouldDeployChange(Change $change)
     {
-        return in_array($change->getBranch(), $this->getBranches());
-    }
-
-    /**
-     * Return the path to the given branch.
-     *
-     * @param string $branch
-     * @return mixed
-     */
-    public function getBranchDir(string $branch)
-    {
-        return $this->getBranches()[$branch]['path'];
-    }
-
-    /**
-     * Return an array of commands that must be executed for the given branch.
-     *
-     * @param string $branch
-     * @return mixed
-     */
-    public function getBranchCommands(string $branch)
-    {
-        return $this->getBranches()[$branch]['commands'];
+        return array_key_exists($change->getBranch(), $this->getBranches());
     }
 }

@@ -4,7 +4,7 @@ namespace Deployer\Providers;
 
 use Deployer\Exceptions\Handler;
 
-class ExceptionHandlerServiceProvider
+class ExceptionHandlerServiceProvider implements ServiceProvider
 {
     public static function register()
     {

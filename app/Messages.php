@@ -30,8 +30,8 @@ class Messages
         return "Error deploying branch {$changeBranch}";
     }
 
-    public static function getDeployingService(string $service): string
+    public static function getDeployingRepository(string $repository): string
     {
-        return "Deploying repository {$service}";
+        return "Deploying repository {$repository}";
     }
 }
