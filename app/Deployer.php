@@ -12,7 +12,7 @@ use Deployer\Services\Service;
 class Deployer
 {
 
-    const VERSION = '1.0.0';
+    const VERSION = '2.0.0';
 
     /** @var \Deployer\Log\Log  */
     private $log;
