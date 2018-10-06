@@ -6,7 +6,7 @@ use Deployer\Exceptions\MessengerNotFound;
 
 class MessengerFactory
 {
-    public function create($class, $message, $configuration)
+    public function create($class, $configuration)
     {
         $messengerClass = $this->getMessengerClass($class);
 
@@ -14,7 +14,7 @@ class MessengerFactory
             throw new MessengerNotFound();
         }
 
-        return new $messengerClass($message, $configuration);
+        return new $messengerClass($configuration);
     }
 
     public function getMessengerClass($class)

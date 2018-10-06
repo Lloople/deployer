@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Deployer\Messengers\Slack;
-
 
 use GuzzleHttp\Client;
 
@@ -11,7 +9,6 @@ class Slack
 
     private $client;
 
-    private $message;
     private $username;
     private $icon;
     private $channel;
@@ -19,9 +16,8 @@ class Slack
 
     public $showIcon = true;
 
-    public function __construct(string $message, array $options = [])
+    public function __construct(array $options = [])
     {
-        $this->message = $message;
         $this->client = $this->setClient($options);
 
         $this->token = _get_arr($options, 'token', config('slack.token'));
@@ -32,17 +28,6 @@ class Slack
         $this->username = _get_arr($options, 'username', config('slack.default.username'));
         $this->avatar = _get_arr($options, 'avatar', config('slack.default.avatar'));
         $this->channel = _get_arr($options, 'channel', config('slack.default.channel'));
-    }
-
-    /**
-     * @param string $message
-     * @return Slack
-     */
-    public function message(string $message): Slack
-    {
-        $this->message = $message;
-
-        return $this;
     }
 
     /**
@@ -78,8 +63,10 @@ class Slack
         return $this;
     }
 
-    public function send()
+    public function send(string $message)
     {
+        $this->message = $message;
+
         return $this->client->post('/api/chat.postMessage', [
             'form_params' => $this->getParams(),
         ]);

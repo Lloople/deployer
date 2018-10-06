@@ -89,9 +89,9 @@ class Deployer
         }
 
         foreach ($service->getMessengers() as $messenger => $configuration) {
-            $messenger = (new MessengerFactory())->create($messenger, $logResult, $configuration);
+            $messenger = (new MessengerFactory())->create($messenger, $configuration);
 
-            $response = $messenger->send();
+            $response = $messenger->send($logResult);
         }
     }
 
