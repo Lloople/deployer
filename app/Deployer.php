@@ -5,7 +5,7 @@ namespace Deployer;
 use Deployer\Exceptions\BranchPathNotFoundException;
 use Deployer\Factories\MessengerFactory;
 use Deployer\Log\Log;
-use Deployer\Providers\DeployerServiceProvider;
+use Deployer\Providers\ServiceProviderContract;
 use Deployer\Services\Branch;
 use Deployer\Services\Service;
 
@@ -28,12 +28,12 @@ class Deployer
     /**
      * @param \Deployer\Services\Service $service
      */
-    public function run(Service $service)
+    public function deploy(Service $service)
     {
         $this->log->info(Messages::getDeployingRepository($service->getRepository()));
 
         $service->getBranchesToDeploy()->each(function (Branch $branch) {
-            $this->deploy($branch);
+            $this->deployBranch($branch);
         });
 
         $this->afterDeploymentTasks($service);
@@ -62,7 +62,7 @@ class Deployer
      *
      * @throws \Deployer\Exceptions\BranchPathNotFoundException
      */
-    protected function deploy(Branch $branch)
+    protected function deployBranch(Branch $branch)
     {
         $this->log->info(Messages::getDeployingBranch($branch->getName()));
 
