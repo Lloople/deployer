@@ -14,9 +14,6 @@ class Deployer
 
     const VERSION = '1.0.0';
 
-    /** @var Service */
-    private $service;
-
     /** @var \Deployer\Log\Log  */
     private $log;
 
@@ -37,22 +34,6 @@ class Deployer
         });
 
         $this->afterDeploymentTasks($service);
-    }
-
-    /**
-     * @param string $token
-     *
-     * @throws \Exception
-     */
-    public function setService(string $token)
-    {
-        $configuration = collect(config('repositories'))->get($token);
-
-        if (! $configuration) {
-            throw new \Exception('Service not found.', 404);
-        }
-
-        $this->service = new $configuration['service']($configuration);
     }
 
     /**
