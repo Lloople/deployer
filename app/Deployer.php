@@ -82,14 +82,15 @@ class Deployer
     {
         $this->log->info(Messages::getDeploymentCompleted());
 
-        $logDump = $this->log->dump();
+        $logResult = $this->log->dump();
 
         if ($this->log->inDebug()) {
-            echo $logDump;
+            echo $logResult;
         }
 
         foreach ($service->getMessengers() as $messenger => $configuration) {
-            $messenger = (new MessengerFactory())->create($messenger, $logDump, $configuration);
+            $messenger = (new MessengerFactory())->create($messenger, $logResult, $configuration);
+
             $response = $messenger->send();
         }
     }

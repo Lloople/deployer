@@ -8,7 +8,7 @@ $serviceProvider->load();
 
 $request = new \Deployer\Request();
 
-$service = \Deployer\Services\Service::getFromRequest($request);
+$service = (new \Deployer\Factories\ServiceFactory())->createFromRequest($request);
 
 $deployer = new Deployer\Deployer();
 

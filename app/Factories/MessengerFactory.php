@@ -1,9 +1,6 @@
 <?php
 
-
 namespace Deployer\Factories;
-
-
 
 use Deployer\Exceptions\MessengerNotFound;
 
@@ -17,7 +14,7 @@ class MessengerFactory
             throw new MessengerNotFound();
         }
 
-        return (new $messengerClass($message, $configuration));
+        return new $messengerClass($message, $configuration);
     }
 
     public function getMessengerClass($class)

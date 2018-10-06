@@ -2,10 +2,7 @@
 
 namespace Deployer\Services;
 
-use Deployer\Configuration;
-use Deployer\Exceptions\InvalidTokenException;
 use Deployer\Log\Log;
-use Deployer\Request;
 use Tightenco\Collect\Support\Collection;
 
 abstract class Service
@@ -28,17 +25,6 @@ abstract class Service
         $this->repository = $configuration['repository'];
 
         $this->log = Log::instance();
-    }
-
-    public static function getFromRequest(Request $request): Service
-    {
-        $configuration = Configuration::instance()->get('repositories.'.$request->getToken());
-
-        if (! $configuration) {
-            throw new InvalidTokenException();
-        }
-
-        return new $configuration['service']($configuration, $request);
     }
 
     public function getRepository(): string { return $this->repository; }
