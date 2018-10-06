@@ -3,7 +3,7 @@
 return [
     'token' => [
         'repository' => '',
-        'deployer'   => \Deployer\Servers\Bitbucket\BitbucketServer::class,
+        'service'   => \Deployer\Services\Bitbucket\BitbucketService::class,
         'branches'   => [
             'develop' => [
                 'path'     => '',

@@ -4,7 +4,7 @@ namespace Deployer\Providers;
 
 use Deployer\Configuration;
 
-class ConfigurationServiceProvider
+class ConfigurationServiceProvider implements ServiceProviderContract
 {
 
     public static function register()

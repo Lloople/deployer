@@ -41,11 +41,11 @@ class LogMessageTest extends TestCase
     {
         $message = new Message('success', 'Message format testing');
 
-        $this->assertEquals('SUCCESS: Message format testing' . PHP_EOL, $message->formatted());
+        $this->assertEquals('SUC: Message format testing' . PHP_EOL, $message->formatted());
 
-        $message = new Message('🐶', '🌭');
+        $message = new Message('INF', '🌭');
 
-        $this->assertEquals('🐶: 🌭' . PHP_EOL, $message->formatted());
+        $this->assertEquals('INF: 🌭' . PHP_EOL, $message->formatted());
     }
 
 

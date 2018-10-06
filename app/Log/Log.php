@@ -9,22 +9,22 @@ final class Log
 
     private $debug = false;
 
-    private function __construct() { }
+    static $instance = null;
 
-    /**
-     * Create or gets the instance of Log.
-     *
-     * @return \Deployer\Log
-     */
-    public static function instance()
+
+    private function __construct(bool $debug = false)
     {
-        static $instance = null;
+        $this->debug = $debug;
+    }
 
-        if (is_null($instance)) {
-            $instance = new Log();
+    public static function instance($debug = false)
+    {
+
+        if (self::$instance === null) {
+            self::$instance = new Log($debug);
         }
 
-        return $instance;
+        return self::$instance;
     }
 
     public function getMessages(): array { return $this->messages; }
@@ -132,5 +132,10 @@ final class Log
         return implode('', array_map(function (Message $message) {
             return $message->formatted();
         }, $this->getMessages()));
+    }
+
+    public static function destroy()
+    {
+        self::$instance = null;
     }
 }

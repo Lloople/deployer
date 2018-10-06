@@ -2,12 +2,14 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
+$serviceProvider = new \Deployer\Providers\ServiceProvider();
+
+$serviceProvider->load();
+
+$request = new \Deployer\Request();
+
+$service = (new \Deployer\Factories\ServiceFactory())->createFromRequest($request);
+
 $deployer = new Deployer\Deployer();
 
-$repository = $deployer->getAuthorization();
-
-$server = new $repository['deployer']($repository);
-
-$server->log->setDebug(config('app.debug'));
-
-$deployer->deploy($server);
+$deployer->deploy($service);

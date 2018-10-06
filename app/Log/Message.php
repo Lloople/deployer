@@ -19,6 +19,11 @@ class Message
         return $this->type;
     }
 
+    public function getTypeShort(): string
+    {
+        return substr($this->getType(), 0, 3);
+    }
+
     public function getMessage(): string
     {
         return $this->message;
@@ -50,7 +55,7 @@ class Message
 
     public function formatted()
     {
-        return strtoupper($this->getType()) . ': ' . $this->getMessage() . PHP_EOL;
+        return strtoupper($this->getTypeShort()) . ': ' . $this->getMessage() . PHP_EOL;
     }
 
 }

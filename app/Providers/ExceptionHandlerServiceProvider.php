@@ -1,12 +1,10 @@
 <?php
 
-
 namespace Deployer\Providers;
-
 
 use Deployer\Exceptions\Handler;
 
-class ExceptionHandlerServiceProvider
+class ExceptionHandlerServiceProvider implements ServiceProviderContract
 {
     public static function register()
     {

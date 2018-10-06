@@ -7,7 +7,6 @@ return [
 
     'debug'    => true,
 
-
     'providers' => [
         Deployer\Providers\ConfigurationServiceProvider::class,
         Deployer\Providers\ExceptionHandlerServiceProvider::class,

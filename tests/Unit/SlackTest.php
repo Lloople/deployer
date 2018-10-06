@@ -18,7 +18,7 @@ class SlackTest extends TestCase
     {
         parent::setUp();
 
-        $this->slack = new Slack('This is the message', ['token' => '🐶🐱🐴🐟']);
+        $this->slack = new Slack('This is the message', ['token' => '🐶🐱🐴🐟', 'avatar' => ':bot:']);
     }
 
     /** @test */

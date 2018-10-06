@@ -1,6 +1,6 @@
 <?php
 
-namespace Deployer\Servers;
+namespace Deployer\Services;
 
 abstract class Change
 {
@@ -50,5 +50,10 @@ abstract class Change
         $this->branch = $branch;
 
         return $this;
+    }
+
+    public function isBranch()
+    {
+        return $this->getType() == 'branch';
     }
 }

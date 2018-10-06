@@ -2,14 +2,13 @@
 
 namespace Deployer\Providers;
 
-
-class DeployerServiceProvider
+class ServiceProvider
 {
 
-    public static function load(array $providers = [])
+    public function load(array $providers = [])
     {
         if (empty($providers)) {
-            $providers = self::getAppProviders();
+            $providers = $this->getAppProviders();
         }
 
         foreach ($providers as $provider) {
@@ -17,7 +16,7 @@ class DeployerServiceProvider
         }
     }
 
-    private static function getAppProviders()
+    private function getAppProviders()
     {
         $appConfiguration = include base_path('configuration') . '/app.php';
 
