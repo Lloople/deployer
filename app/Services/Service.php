@@ -14,7 +14,7 @@ abstract class Service
     public $log;
 
     protected $repository;
-    protected $changes = [];
+    protected $commits = [];
     protected $messengers = [];
     protected $branches = [];
 
@@ -44,29 +44,25 @@ abstract class Service
         return $this;
     }
 
-    public function setChanges(array $changes)
+    public function setCommits(array $commits)
     {
-        $this->changes = $changes;
+        $this->commits = $commits;
 
         return $this;
     }
 
     public function getBranchesToDeploy(): Collection
     {
-        return collect($this->getChanges())->filter(function (Change $change) {
-            return $change->isBranch() && $this->shouldDeployChange($change);
-        })->map(function (Change $change) {
-            return $this->createBranch($change->getBranch());
-        });
+        return collect($this->commits)->filter(function (Commit $commit) {
+            return $commit->isBranch() && $this->shouldDeployCommit($commit);
+        })->map(function (Commit $commit) {
+
+            return new Branch($commit->getBranch(), $this->branches[$commit->getBranch()]);
+        })->unique->getName();
     }
 
-    private function createBranch(string $branch)
+    public function shouldDeployCommit(Commit $commit)
     {
-        return new Branch($branch, $this->getBranches()[$branch]);
-    }
-
-    public function shouldDeployChange(Change $change)
-    {
-        return array_key_exists($change->getBranch(), $this->getBranches());
+        return array_key_exists($commit->getBranch(), $this->branches);
     }
 }

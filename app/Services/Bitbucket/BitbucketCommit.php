@@ -2,9 +2,9 @@
 
 namespace Deployer\Services\Bitbucket;
 
-use Deployer\Services\Change;
+use Deployer\Services\Commit;
 
-class BitbucketChange extends Change
+class BitbucketCommit extends Commit
 {
 
     public function __construct($rawData)

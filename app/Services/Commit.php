@@ -2,7 +2,7 @@
 
 namespace Deployer\Services;
 
-abstract class Change
+abstract class Commit
 {
 
     public $rawData;
