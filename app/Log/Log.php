@@ -43,15 +43,15 @@ final class Log
      * Create a new message.
      *
      * @param string $type
-     * @param string $message
+     * @param string $text
      */
-    public function message(string $type, string $message)
+    public function message(string $type, string $text)
     {
-        $msg = new Message($type, $message);
-        $this->messages[] = $msg;
+        $message = new Message($type, $text);
+        $this->messages[] = $message;
 
-        if ($this->debug) {
-            $msg->print();
+        if ($this->inDebug()) {
+            $message->log();
         }
     }
 
