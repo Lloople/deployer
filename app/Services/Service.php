@@ -2,17 +2,10 @@
 
 namespace Deployer\Services;
 
-use Deployer\Log\Log;
 use Tightenco\Collect\Support\Collection;
 
 abstract class Service
 {
-
-    /**
-     * @var \Deployer\Log
-     */
-    public $log;
-
     protected $repository;
     protected $commits = [];
     protected $messengers = [];
@@ -23,17 +16,9 @@ abstract class Service
         $this->branches = $configuration['branches'] ?? [];
         $this->messengers = $configuration['messengers'] ?? [];
         $this->repository = $configuration['repository'];
-
-        $this->log = Log::instance();
     }
 
     public function getRepository(): string { return $this->repository; }
-
-    public function getChanges(): array { return $this->changes; }
-
-    public function getDeployableChanges(): array { return $this->deployableChanges; }
-
-    public function getBranches(): array { return $this->branches; }
 
     public function getMessengers(): array { return $this->messengers; }
 

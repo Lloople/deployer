@@ -5,7 +5,6 @@ namespace Deployer;
 use Deployer\Exceptions\BranchPathNotFoundException;
 use Deployer\Factories\MessengerFactory;
 use Deployer\Log\Log;
-use Deployer\Providers\ServiceProviderContract;
 use Deployer\Services\Branch;
 use Deployer\Services\Service;
 
@@ -22,9 +21,6 @@ class Deployer
         $this->log = Log::instance(config('app.debug'));
     }
 
-    /**
-     * @param \Deployer\Services\Service $service
-     */
     public function deploy(Service $service)
     {
         $this->log->info(Messages::getDeployingRepository($service->getRepository()));
@@ -33,7 +29,17 @@ class Deployer
             $this->deployBranch($branch);
         });
 
-        $this->afterDeploymentTasks($service);
+        $this->log->info(Messages::getDeploymentCompleted());
+
+        $service->getMessengers()->each(function ($configuration, $messengerClass) {
+            $messenger = (new MessengerFactory())->create($messengerClass, $configuration);
+
+            $messenger->send($this->log->dump());
+        });
+
+        $response = new Response($this->log->dump(), 404, ['deployer-version' => self::VERSION]);
+
+        $response->send();
     }
 
     /**
@@ -78,21 +84,19 @@ class Deployer
         $this->log->success(Messages::getDeploySuccess($branch->getName()));
     }
 
-    public function afterDeploymentTasks(Service $service)
+    public function finishDeployment(Service $service)
     {
         $this->log->info(Messages::getDeploymentCompleted());
 
         $logResult = $this->log->dump();
-
-        if ($this->log->inDebug()) {
-            echo $logResult;
-        }
 
         foreach ($service->getMessengers() as $messenger => $configuration) {
             $messenger = (new MessengerFactory())->create($messenger, $configuration);
 
             $response = $messenger->send($logResult);
         }
+
+        return new Response($logResult, 404, ['deployer-version' => self::VERSION]);
     }
 
     /**
