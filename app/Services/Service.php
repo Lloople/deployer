@@ -6,8 +6,12 @@ use Tightenco\Collect\Support\Collection;
 
 abstract class Service
 {
+    /** @var string */
     protected $repository;
-    protected $commits = [];
+
+    /** @var Collection */
+    protected $commits;
+
     protected $messengers = [];
     protected $branches = [];
 
@@ -20,33 +24,16 @@ abstract class Service
 
     public function getRepository(): string { return $this->repository; }
 
-    public function getMessengers(): array { return $this->messengers; }
+    public function getCommits(): Collection { return $this->commits; }
 
-    public function setRepository(string $repository)
+    public function getBranchConfiguration($branch): array { return $this->branches[$branch]; }
+
+    public function getMessengers(): Collection
     {
-        $this->repository = $repository;
-
-        return $this;
+        return collect($this->messengers);
     }
 
-    public function setCommits(array $commits)
-    {
-        $this->commits = $commits;
-
-        return $this;
-    }
-
-    public function getBranchesToDeploy(): Collection
-    {
-        return collect($this->commits)->filter(function (Commit $commit) {
-            return $commit->isBranch() && $this->shouldDeployCommit($commit);
-        })->map(function (Commit $commit) {
-
-            return new Branch($commit->getBranch(), $this->branches[$commit->getBranch()]);
-        })->unique->getName();
-    }
-
-    public function shouldDeployCommit(Commit $commit)
+    public function shouldDeployCommit(Commit $commit): bool
     {
         return array_key_exists($commit->getBranch(), $this->branches);
     }

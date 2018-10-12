@@ -21,23 +21,16 @@ class BitbucketService extends Service
 
         try {
 
-            $this->setRepository($payload->repository->name);
-            $this->setCommits($payload->push->changes);
+            $this->repository = $payload->repository->name;
+
+            $this->commits = collect($payload->push->changes)->map(function ($commit) {
+                return $commit->new !== null
+                    ? new BitbucketCommit($commit)
+                    : null;
+            })->filter();
 
         } catch (Exception $e) {
             throw new Exception('Bitbucket Payload bad format.', 403);
         }
     }
-
-    public function setCommits(array $commits)
-    {
-        $commits = collect($commits)->map(function ($commit) {
-            return $commit->new !== null
-                ? new BitbucketCommit($commit)
-                : null;
-        })->filter()->toArray();
-
-        return parent::setCommits($commits);
-    }
-
 }

@@ -8,8 +8,8 @@ return [
             'develop' => [
                 'path'     => '',
                 'commands' => [
-                    'git pull origin %branch%',
-                    'COMPOSER_HOME="%branchDir%" composer install',
+                    'git pull origin :branch',
+                    'COMPOSER_HOME=":path" composer install',
                     'php artisan migrate',
                 ],
             ],

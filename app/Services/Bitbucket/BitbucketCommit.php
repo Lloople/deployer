@@ -15,8 +15,6 @@ class BitbucketCommit extends Commit
         $this->setType($rawData->new->type);
         $this->setMessage($rawData->new->target->message);
         $this->setBranch($rawData->new->name);
-
-        return $this;
     }
 
     public function extractAuthorFromChange()

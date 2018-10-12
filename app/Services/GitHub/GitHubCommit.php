@@ -15,7 +15,5 @@ class GitHubCommit extends Commit
         $this->setType('branch');
         $this->setMessage($commit->message);
         $this->setBranch($branch);
-
-        return $this;
     }
 }

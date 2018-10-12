@@ -21,7 +21,7 @@ class GitHubService extends Service
 
         try {
 
-            $this->setRepository($this->payload->repository->name);
+            $this->repository = $this->payload->repository->name;
 
             $this->commits = collect($this->payload->commits)->map(function ($commit) {
                 return new GitHubCommit($commit, $this->getBranchName());

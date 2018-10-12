@@ -19,7 +19,7 @@ class MessengerFactory
 
     public function getMessengerClass($class)
     {
-        return 'Deployer\Messengers\\' . ucfirst($class) . '\\' . ucfirst($class);
+        return 'Deployer\Messengers\\' . ucfirst($class) . '\\' . ucfirst($class).'Messenger';
     }
 
 }

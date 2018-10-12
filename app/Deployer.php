@@ -6,6 +6,7 @@ use Deployer\Exceptions\BranchPathNotFoundException;
 use Deployer\Factories\MessengerFactory;
 use Deployer\Log\Log;
 use Deployer\Services\Branch;
+use Deployer\Services\Commit;
 use Deployer\Services\Service;
 
 class Deployer
@@ -25,7 +26,19 @@ class Deployer
     {
         $this->log->info(Messages::getDeployingRepository($service->getRepository()));
 
-        $service->getBranchesToDeploy()->each(function (Branch $branch) {
+        $service->getCommits()->filter(function (Commit $commit) use ($service) {
+            if ($commit->isBranch() && $service->shouldDeployCommit($commit)) {
+                return true;
+            }
+
+            $this->log->info("Ignoring branch {$commit->getBranch()}");
+
+            return false;
+        })->map(function (Commit $commit) use ($service) {
+
+            return new Branch($commit->getBranch(), $service->getBranchConfiguration($commit->getBranch()));
+
+        })->unique->getName()->each(function (Branch $branch) {
             $this->deployBranch($branch);
         });
 
@@ -37,7 +50,7 @@ class Deployer
             $messenger->send($this->log->dump());
         });
 
-        $response = new Response($this->log->dump(), 404, ['deployer-version' => self::VERSION]);
+        $response = new Response($this->log->dump(), 200, ['deployer-version' => self::VERSION]);
 
         $response->send();
     }
@@ -59,18 +72,18 @@ class Deployer
 
             $output = [];
 
-            $commandExec = str_replace(['%branch%', '%branchDir%'], [$branch->getName(), $branch->getPath()], $command);
+            $command = str_replace([':branch', ':path'], [$branch->getName(), $branch->getPath()], $command);
 
-            $this->log->info("Executing " . $commandExec);
+            $this->log->info("Executing {$command}");
 
-            exec("cd {$branch->getPath()} && {$commandExec} 2>&1", $output, $return);
+            exec("cd {$branch->getPath()} && {$command} 2>&1", $output, $return);
 
             foreach ($output as $outputMessage) {
-                $this->log->info("\t " . $outputMessage);
+                $this->log->info("\t {$outputMessage}");
             }
 
             if ($return !== 0) {
-                $this->log->error("An error {$return} has occurred while trying to execute {$commandExec}.");
+                $this->log->error("An error {$return} has occurred while trying to execute {$command}.");
                 break;
             }
         }
@@ -82,21 +95,6 @@ class Deployer
         }
 
         $this->log->success(Messages::getDeploySuccess($branch->getName()));
-    }
-
-    public function finishDeployment(Service $service)
-    {
-        $this->log->info(Messages::getDeploymentCompleted());
-
-        $logResult = $this->log->dump();
-
-        foreach ($service->getMessengers() as $messenger => $configuration) {
-            $messenger = (new MessengerFactory())->create($messenger, $configuration);
-
-            $response = $messenger->send($logResult);
-        }
-
-        return new Response($logResult, 404, ['deployer-version' => self::VERSION]);
     }
 
     /**
