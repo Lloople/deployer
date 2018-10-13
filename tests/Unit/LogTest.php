@@ -14,12 +14,11 @@ class LogTest extends TestCase
      */
     private $log;
 
-
     public function setUp()
     {
         parent::setUp();
-        $this->log = Log::instance();
 
+        $this->log = Log::instance();
     }
 
     /** @test */
