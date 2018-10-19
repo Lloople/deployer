@@ -53,9 +53,19 @@ class Message
         echo $this->formatted();
     }
 
+    public function log()
+    {
+        file_put_contents('deployer.log', $this->getDate(). ' - ' . $this->formatted(), FILE_APPEND);
+    }
+
     public function formatted()
     {
         return strtoupper($this->getTypeShort()) . ': ' . $this->getMessage() . PHP_EOL;
+    }
+
+    private function getDate()
+    {
+        return date('Y-m-d H:i:s');
     }
 
 }

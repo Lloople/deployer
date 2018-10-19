@@ -2,19 +2,16 @@
 
 namespace Deployer\Services;
 
-use Deployer\Log\Log;
 use Tightenco\Collect\Support\Collection;
 
 abstract class Service
 {
-
-    /**
-     * @var \Deployer\Log
-     */
-    public $log;
-
+    /** @var string */
     protected $repository;
-    protected $changes = [];
+
+    /** @var Collection */
+    protected $commits;
+
     protected $messengers = [];
     protected $branches = [];
 
@@ -23,50 +20,21 @@ abstract class Service
         $this->branches = $configuration['branches'] ?? [];
         $this->messengers = $configuration['messengers'] ?? [];
         $this->repository = $configuration['repository'];
-
-        $this->log = Log::instance();
     }
 
     public function getRepository(): string { return $this->repository; }
 
-    public function getChanges(): array { return $this->changes; }
+    public function getCommits(): Collection { return $this->commits; }
 
-    public function getDeployableChanges(): array { return $this->deployableChanges; }
+    public function getBranchConfiguration($branch): array { return $this->branches[$branch]; }
 
-    public function getBranches(): array { return $this->branches; }
-
-    public function getMessengers(): array { return $this->messengers; }
-
-    public function setRepository(string $repository)
+    public function getMessengers(): Collection
     {
-        $this->repository = $repository;
-
-        return $this;
+        return collect($this->messengers);
     }
 
-    public function setChanges(array $changes)
+    public function shouldDeployCommit(Commit $commit): bool
     {
-        $this->changes = $changes;
-
-        return $this;
-    }
-
-    public function getBranchesToDeploy(): Collection
-    {
-        return collect($this->getChanges())->filter(function (Change $change) {
-            return $change->isBranch() && $this->shouldDeployChange($change);
-        })->map(function (Change $change) {
-            return $this->createBranch($change->getBranch());
-        });
-    }
-
-    private function createBranch(string $branch)
-    {
-        return new Branch($branch, $this->getBranches()[$branch]);
-    }
-
-    public function shouldDeployChange(Change $change)
-    {
-        return array_key_exists($change->getBranch(), $this->getBranches());
+        return array_key_exists($commit->getBranch(), $this->branches);
     }
 }

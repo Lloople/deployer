@@ -43,10 +43,10 @@ class ServiceTest extends TestCase
 
         config(['repositories.valid-token' => [
             'repository' => 'testing-repository',
-            'service' => 'bitbucket'
+            'service' => FakeService::class
         ]]);
 
-        $fakeService = (new ServiceFactory())->createFromRequest(new FakeBitbucketRequest());
+        $fakeService = (new ServiceFactory())->createFromRequest(new Request());
 
         $this->assertEquals('testing-repository', $fakeService->getRepository());
     }

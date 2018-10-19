@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use Deployer\Exceptions\MessengerNotFound;
 use Deployer\Factories\MessengerFactory;
-use Deployer\Messengers\Slack\Slack;
+use Deployer\Messengers\Slack\SlackMessenger;
 use Tests\TestCase;
 
 class MessengerFactoryTest extends TestCase
@@ -27,16 +27,16 @@ class MessengerFactoryTest extends TestCase
     {
         $className = $this->factory->getMessengerClass('spider');
 
-        $this->assertEquals('Deployer\\Messengers\\Spider\\Spider', $className);
+        $this->assertEquals('Deployer\\Messengers\\Spider\\SpiderMessenger', $className);
 
     }
 
     /** @test */
     public function can_create_slack_messenger_from_factory()
     {
-        $slack = $this->factory->create('slack', 'This is the message', ['token' => '🐶']);
+        $slack = $this->factory->create('slack', ['token' => '🐶']);
 
-        $this->assertInstanceOf(Slack::class, $slack);
+        $this->assertInstanceOf(SlackMessenger::class, $slack);
 
     }
 

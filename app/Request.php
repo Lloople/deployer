@@ -20,6 +20,7 @@ class Request
         }
 
         $this->token = str_replace('/', '', $_SERVER['REQUEST_URI']);
+
         $this->payload = json_decode(file_get_contents('php://input'));
     }
 

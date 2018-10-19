@@ -22,7 +22,7 @@ class ServiceFactory
         $serviceClass = $this->getServiceClass($configuration['service']);
 
         if (! class_exists($serviceClass)) {
-            throw new ServiceNotFound();
+            throw new ServiceNotFound($serviceClass);
         }
 
         return new $serviceClass($configuration, $request);

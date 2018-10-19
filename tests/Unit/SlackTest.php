@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use Deployer\Messengers\Slack\Slack;
+use Deployer\Messengers\Slack\SlackMessenger;
 use GuzzleHttp\Client;
 use Tests\TestCase;
 
@@ -10,7 +10,7 @@ class SlackTest extends TestCase
 {
 
     /**
-     * @var Slack
+     * @var SlackMessenger
      */
     protected $slack;
 
@@ -18,13 +18,13 @@ class SlackTest extends TestCase
     {
         parent::setUp();
 
-        $this->slack = new Slack('This is the message', ['token' => '🐶🐱🐴🐟', 'avatar' => ':bot:']);
+        $this->slack = new SlackMessenger(['token' => '🐶🐱🐴🐟']);
     }
 
     /** @test */
     public function can_create_slack_message_instance()
     {
-        $this->assertInstanceOf(Slack::class, $this->slack);
+        $this->assertInstanceOf(SlackMessenger::class, $this->slack);
     }
 
     /** @test */
@@ -34,54 +34,16 @@ class SlackTest extends TestCase
     }
 
     /** @test */
-    public function show_icon_state_can_be_switched()
-    {
-        $this->assertTrue($this->slack->showIcon);
-
-        $this->slack->disableIcon();
-
-        $this->assertFalse($this->slack->showIcon);
-
-        $this->slack->enableIcon();
-
-        $this->assertTrue($this->slack->showIcon);
-
-    }
-
-    /** @test */
     public function can_modify_slack_params()
     {
-        $this->slack->disableIcon();
-
-        $this->assertEquals($this->slack->printMessage(), 'This is the message');
-
-        $this->slack->as('another_user')->channel('#testing')->avatar(':fire:')->message('🐵');
+        $this->slack->as('another_user')->channel('#testing');
 
         $params = $this->slack->getParams();
 
-        $this->assertStringStartsWith('another_user - ' . strtoupper(gethostname()) . ' - ' . date('YmdH'), $params['username']);
+        $this->assertStringStartsWith('another_user - ' . strtoupper(gethostname()) . ' - ' . date('Y-m-d H:'), $params['username']);
 
         $this->assertEquals($params['channel'], '#testing');
 
-        $this->assertEquals($params['icon_emoji'], ':bot:');
-
         $this->assertEquals($params['token'], '🐶🐱🐴🐟');
-
-        $this->assertEquals($params['text'], '🐵');
     }
-
-    /** @test */
-    public function default_icons_are_set_properly()
-    {
-        $this->slack->message('SUCCESS: The icon should be grin');
-        $this->assertEquals(':grin:', $this->slack->getParams('icon_emoji'));
-
-        $this->slack->message('WARNING: The icon should be thinking face');
-        $this->assertEquals(':thinking_face:', $this->slack->getParams('icon_emoji'));
-
-        $this->slack->message('ERROR: The icon should be scream');
-        $this->assertEquals(':scream:', $this->slack->getParams('icon_emoji'));
-    }
-
-
 }

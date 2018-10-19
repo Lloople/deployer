@@ -13,7 +13,6 @@ class ConfigurationTest extends TestCase
      */
     private $configuration;
 
-
     public function setUp()
     {
         parent::setUp();

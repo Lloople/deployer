@@ -2,9 +2,9 @@
 
 namespace Deployer\Services\Bitbucket;
 
-use Deployer\Services\Change;
+use Deployer\Services\Commit;
 
-class BitbucketChange extends Change
+class BitbucketCommit extends Commit
 {
 
     public function __construct($rawData)
@@ -15,8 +15,6 @@ class BitbucketChange extends Change
         $this->setType($rawData->new->type);
         $this->setMessage($rawData->new->target->message);
         $this->setBranch($rawData->new->name);
-
-        return $this;
     }
 
     public function extractAuthorFromChange()
