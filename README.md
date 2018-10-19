@@ -8,6 +8,10 @@ and the commands to be executed per branch.
 - Web server Apache or Nginx
 - SSH Key authorization for private repositories 
 
+## Currently supported services
+- Bitbucket
+- Github
+
 ## Configuration
 
 Copy the `configuration/example.repositories.php`, rename it to `repositories.php` and configure it to your
