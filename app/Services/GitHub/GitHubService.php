@@ -34,7 +34,7 @@ class GitHubService extends Service
 
     private function getBranchName()
     {
-        return str_replace('refs/heads', '', $this->payload->ref);
+        return str_replace('refs/heads/', '', $this->payload->ref);
     }
 
 }
